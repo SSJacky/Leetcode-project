@@ -15,103 +15,35 @@ struct ListNode {
 
 typedef struct ListNode ListNode;
 
-void insert_node(ListNode **head_node, int value)
-{
-    ListNode *tmp = NULL;
-    ListNode *current = *head_node;
-    ListNode *previous = NULL;
-
-    if (*head_node == NULL)
-    {
-        tmp = (ListNode *)malloc(sizeof(ListNode));
-        tmp->next = NULL;
-        tmp->val = value;
-        *head_node = tmp;
-        return;
+void print_all_ptr(ListNode *list){
+    printf("List : ");
+    struct ListNode *q = list;
+    while (q != NULL) {
+        printf("%d->", q->val);
+        q = q->next;
     }
-
-    while (current->next != NULL)
-    {
-        if (value > current->val)
-        {
-            previous = current;
-            current = current->next;
-        }
-        else
-        {
-            if (current == *head_node)
-            {
-                tmp = (ListNode *)malloc(sizeof(ListNode));
-                tmp->val = value;
-                tmp->next = current;
-                *head_node = tmp;
-                return;
-            }
-            else
-            {
-                tmp = (ListNode *)malloc(sizeof(ListNode));
-                tmp->val = value;
-                tmp->next = current;
-                previous->next = tmp;
-                return;
-            }
-
-        }
-
-    }
-
-    if (current->next == NULL)
-    {
-        if (value >= current->val)
-        {
-            tmp = (ListNode *)malloc(sizeof(ListNode));
-            tmp->val = value;
-            tmp->next = NULL;
-            current->next = tmp;
-        }
-        else
-        {
-            if (current == *head_node)
-            {
-                tmp = (ListNode *)malloc(sizeof(ListNode));
-                tmp->val = value;
-                tmp->next = current;
-                *head_node = tmp;
-                return;
-            }
-            else
-            {
-                tmp = (ListNode *)malloc(sizeof(ListNode));
-                tmp->val = value;
-                tmp->next = current;
-                previous->next = tmp;
-                return;
-            }
-        }
-    }
+    printf("N\n");
 }
 
-struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2)
-{
-    ListNode *head = NULL;
-    if (l1 == NULL && l2 == NULL) return head;
-    else if (l1 == NULL) return l2;
-    else if (l2 == NULL) return l1;
-
-    head = l1;
-
-    insert_node(&head, l2->val);
-
-    while (l2->next != NULL)
+struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
+    struct ListNode *head;
+    struct ListNode **ptr = &head;
+    for(;l1&&l2;ptr=&(*ptr)->next)
     {
-        l2 = l2->next;
-        insert_node(&head, l2->val);
+       if(l1->val<l2->val){
+           *ptr=l1;
+           l1 = l1->next;
+       }
+       else{
+           *ptr=l2;
+           l2 = l2->next;
+       }
+        //print_all_ptr(head);
     }
-
-
+    *ptr = (ListNode *)((uintptr_t)l1 | (uintptr_t)l2);
     return head;
 }
-#include <stdio.h>
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
@@ -120,6 +52,7 @@ int main(int argc, const char * argv[]) {
     struct ListNode *headB
         = (struct ListNode *)calloc(3, sizeof(struct ListNode));
 
+    
     struct ListNode **p = &headA;
     int i;
     for (i = 1; i <= 5; i++) {
@@ -136,7 +69,6 @@ int main(int argc, const char * argv[]) {
         p = &(*p)->next;
     }
     *p = NULL;
-
     printf("List A: ");
     struct ListNode *q = headA;
     while (q != NULL) {
@@ -163,5 +95,6 @@ int main(int argc, const char * argv[]) {
     }
     printf("N\n");
 
+    
     return 0;
 }
