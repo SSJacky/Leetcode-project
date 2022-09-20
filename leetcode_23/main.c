@@ -47,16 +47,24 @@ struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
 
 struct ListNode* mergeKLists(struct ListNode** lists, int listsSize){
   
-  ListNode *head=0;
-  ListNode **ptr=&head;
+  if(listsSize == 0) return NULL;
+  int size = listsSize/2;
+  int bound = listsSize;
+  int j = 0;
+  int odd;
 
-  for(int i = 0;i<listsSize;i++){
-  
-    *ptr=mergeTwoLists(*ptr,lists[i]);
-
+  while(size != 0){
+    for(j = 0;j<size;j++)
+    {
+      lists[j]=mergeTwoLists(lists[j],lists[bound-j-1]);
+    }
+      odd = bound%2;
+      if(odd) bound = bound/2 +1;
+      else bound /= 2;
+      size = bound/2;
   }
 
-  return head;
+  return lists[0];
 
 }
     
