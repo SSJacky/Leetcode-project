@@ -9,10 +9,10 @@
 #include <stdint.h>
 //Definition for singly-linked list.
 struct ListNode {
-      int val;
-      struct ListNode *next;
- };
- 
+    int val;
+    struct ListNode *next;
+};
+
 
 typedef struct ListNode ListNode;
 
@@ -31,60 +31,60 @@ struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
     struct ListNode **ptr = &head;
     for(;l1&&l2;ptr=&(*ptr)->next)
     {
-       if(l1->val<l2->val){
-           *ptr=l1;
-           l1 = l1->next;
-       }
-       else{
-           *ptr=l2;
-           l2 = l2->next;
-       }
+        if(l1->val<l2->val){
+            *ptr=l1;
+            l1 = l1->next;
+        }
+        else{
+            *ptr=l2;
+            l2 = l2->next;
+        }
         //print_all_ptr(head);
     }
     *ptr = (ListNode *)((uintptr_t)l1 | (uintptr_t)l2);
     return head;
 }
 struct ListNode* deleteMiddle(struct ListNode* head){
-
-  ListNode *current = head;
-  int size=1;
-  
-  while(current->next) {
-    size++;
-    current=cureent->next;
-  }
-
-  current = head;
-
-  while(size>0){
-
-    current = current->next
-
-  }
+    
+    ListNode *current = head;
+    int size=1;
+    
+    while(current->next) {
+        size++;
+        current=current->next;
+    }
+    if(size==1)return NULL;
+    current = head;
+    size=size>>1;
+    while(size>1){
+        current = current->next;
+        size--;
+    }
+    current->next=current->next->next;
+    
+    return head;
 }
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     struct ListNode *headA
-        = (struct ListNode *)calloc(5, sizeof(struct ListNode));
-
+    = (struct ListNode *)calloc(6, sizeof(struct ListNode));
+    
     struct ListNode *q = headA;
     
     struct ListNode **p = &headA;
     int i;
-    for (i = 1; i <= 5; i++) {
+    for (i = 1; i <= 6; i++) {
         (*p)->val = i;
         (*p)->next = *p + 1;
         p = &(*p)->next;
     }
-    *p = NULL;
-    printf("List A: ");
+    printf("List A ");
     print_all_ptr(q);
-    }
-    printf("N\n");
-
+  
+    
     struct ListNode *ret = deleteMiddle(headA);
-
+    
     printf("Merged: ");
     q = ret;
     print_all_ptr(q);
