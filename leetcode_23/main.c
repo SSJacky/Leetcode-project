@@ -45,29 +45,40 @@ struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
     return head;
 }
 
+//struct ListNode* mergeKLists(struct ListNode** lists, int listsSize){
+//  
+//  if(listsSize == 0) return NULL;
+//  int size = listsSize/2;
+//  int bound = listsSize;
+//  int j = 0;
+//  int odd;
+//
+//  while(size != 0){
+//    for(j = 0;j<size;j++)
+//    {
+//      lists[j]=mergeTwoLists(lists[j],lists[bound-j-1]);
+//    }
+//      odd = bound%2;
+//      if(odd) bound = bound/2 +1;
+//      else bound /= 2;
+//      size = bound/2;
+//  }
+//
+//  return lists[0];
+//}
+    
 struct ListNode* mergeKLists(struct ListNode** lists, int listsSize){
-  
-  if(listsSize == 0) return NULL;
-  int size = listsSize/2;
-  int bound = listsSize;
-  int j = 0;
-  int odd;
 
-  while(size != 0){
-    for(j = 0;j<size;j++)
-    {
-      lists[j]=mergeTwoLists(lists[j],lists[bound-j-1]);
-    }
-      odd = bound%2;
-      if(odd) bound = bound/2 +1;
-      else bound /= 2;
-      size = bound/2;
-  }
+  /*merge sort*/
+  if(listsSize==0)return NULL;
+  if(listsSize<=1)return *lists;
+  int mid = listsSize >>1;
+  ListNode *left=mergeKLists(lists,mid);
+  ListNode *right=mergeKLists(lists+mid,listsSize-mid);
 
-  return lists[0];
+  return mergeTwoLists(left,right);
 
 }
-    
 struct ListNode* generateList(int *nums, int size) {
     if (nums == NULL || size == 0) return NULL;
 
