@@ -1,68 +1,107 @@
 //
 //  main.c
-//  5_Longest_Palindromic_Substring
-//  1. use dynamic programming to handle O(n^2)
-//  2. use central expand, needs to consider both even and odd condition
-//  Created by 夏蜃詰 on 2022/8/6.
+//  leetcode_21
+//
+//  Created by 夏蜃詰 on 2022/9/13.
 //
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-//#define n 5
-char * longestPalindrome(char * s){
-    char *sub_string = s;
-    uint32_t n = (uint32_t)strlen(s);
-//    uint32_t n_half = n/2;
-    if(n==1) return s;
-    int32_t i = 0;
-    int32_t j = 0;
-    int32_t k = 0;
-    uint32_t max_len = 1;
-    
-    for(i=0;i<n;i++)
-    {
-        /*even length*/
-        j=i;
-        k=i+1;
-        while(j>=0 && k<n)
-        {
-            if(s[j]!=s[k]) break;
-            if(k-j+1>max_len)
-            {
-                max_len = k-j+1;
-                sub_string = &s[j];
-            }
-            k++;
-            j--;
-            
-        }
-        /*odd length*/
-        k=i+1;
-        j=i;
-        while(j>=0 && k<n)
-        {
-            if(s[j]!=s[k+k-j]) break;
-            if(k-j+k-j+1>max_len)
-            {
-                max_len = k-j+k-j+1;
-                sub_string = &s[j];
-            }
-            j--;
+#include <stdint.h>
+//Definition for singly-linked list.
+struct ListNode {
+      int val;
+      struct ListNode *next;
+ };
+ 
 
-        }
+typedef struct ListNode ListNode;
+
+void print_all_ptr(ListNode *list){
+    printf("List : ");
+    struct ListNode *q = list;
+    while (q != NULL) {
+        printf("%d->", q->val);
+        q = q->next;
     }
-    *(sub_string+max_len) = '\0';
-    return sub_string;
-    
+    printf("N\n");
+}
+
+struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
+    struct ListNode *head;
+    struct ListNode **ptr = &head;
+    for(;l1&&l2;ptr=&(*ptr)->next)
+    {
+       if(l1->val<l2->val){
+           *ptr=l1;
+           l1 = l1->next;
+       }
+       else{
+           *ptr=l2;
+           l2 = l2->next;
+       }
+        //print_all_ptr(head);
+    }
+    *ptr = (ListNode *)((uintptr_t)l1 | (uintptr_t)l2);
+    return head;
+}
+
+struct ListNode* partition(struct ListNode* head,int x){
+
+  ListNode **indir = &head;
+  ListNode *current = head;
+
+
+  
+
+
 }
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    char s[] = "ccc";
-    char *ret;
-    ret = longestPalindrome(s);
+    struct ListNode *headA
+        = (struct ListNode *)calloc(6, sizeof(struct ListNode));
 
-    printf("%s\n",ret);
-    printf("\nHello, World!\n");
+    
+    struct ListNode **p = &headA;
+    (*p)->val = 1;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+
+    (*p)->val = 4;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+
+    (*p)->val = 3;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+
+    (*p)->val = 2;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+    
+    (*p)->val = 5;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+    
+    (*p)->val = 2;
+    (*p)->next = *p+1;
+    p=&((*p)->next);
+    
+    *p=NULL;
+//    int i;
+//    for (i = 1; i <= 5; i++) {
+//        (*p)->val = i;
+//        (*p)->next = *p + 1;
+//        p = &(*p)->next;
+//    }
+
+    printf("List A: ");
+    struct ListNode *q = headA;
+    while (q != NULL) {
+        printf("%d->", q->val);
+        q = q->next;
+    }
+    printf("N\n");
+
     return 0;
 }
