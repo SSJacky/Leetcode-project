@@ -26,40 +26,50 @@ void print_all_ptr(ListNode *list){
     printf("N\n");
 }
 
-struct ListNode *mergeTwoLists(struct ListNode *l1,struct ListNode *l2) {
-    struct ListNode *head;
-    struct ListNode **ptr = &head;
-    for(;l1&&l2;ptr=&(*ptr)->next)
-    {
-       if(l1->val<l2->val){
-           *ptr=l1;
-           l1 = l1->next;
-       }
-       else{
-           *ptr=l2;
-           l2 = l2->next;
-       }
-        //print_all_ptr(head);
-    }
-    *ptr = (ListNode *)((uintptr_t)l1 | (uintptr_t)l2);
-    return head;
-}
-
 struct ListNode* partition(struct ListNode* head,int x){
 
-  ListNode **indir = &head;
-  ListNode *current = head;
-
-
-  
-
-
+    if(head == NULL) return NULL;
+    ListNode *bigger = NULL;
+    ListNode *smaller = NULL;
+    ListNode *connect_point = NULL;
+    ListNode *ret=NULL;
+    ListNode *current = head;
+    
+    while(current){
+        if(current->val<x){
+            if(smaller == NULL) {
+                smaller = current;
+                ret = smaller;
+            }
+            else {
+                smaller->next = current;
+                smaller = smaller->next;
+            }
+        }
+        else{
+            if(bigger == NULL) {
+                connect_point = current;
+                bigger = current;
+            }
+            else {
+                bigger->next = current;
+                bigger = bigger->next;
+            }
+        }
+        current=current->next;
+    }
+    
+    if(ret==NULL) return connect_point;
+    if(connect_point == NULL) return ret;
+    else smaller->next = connect_point;
+    bigger->next=NULL;
+    return ret;
 }
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     struct ListNode *headA
-        = (struct ListNode *)calloc(6, sizeof(struct ListNode));
+        = (struct ListNode *)calloc(2, sizeof(struct ListNode));
 
     
     struct ListNode **p = &headA;
@@ -67,34 +77,34 @@ int main(int argc, const char * argv[]) {
     (*p)->next = *p+1;
     p=&((*p)->next);
 
-    (*p)->val = 4;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
+    (*p)->val = 1;
+    (*p)->next = NULL;
+//    p=&((*p)->next);
 
-    (*p)->val = 3;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
-
-    (*p)->val = 2;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
+//    (*p)->val = 3;
+//    (*p)->next = *p+1;
+//    p=&((*p)->next);
+//
+//    (*p)->val = 2;
+//    (*p)->next = *p+1;
+//    p=&((*p)->next);
+//
+//    (*p)->val = 5;
+//    (*p)->next = *p+1;
+//    p=&((*p)->next);
+//
+//    (*p)->val = 1;
+//    (*p)->next = NULL;
+    //p=&((*p)->next);
     
-    (*p)->val = 5;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
-    
-    (*p)->val = 2;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
-    
-    *p=NULL;
+    //*p=NULL;
 //    int i;
 //    for (i = 1; i <= 5; i++) {
 //        (*p)->val = i;
 //        (*p)->next = *p + 1;
 //        p = &(*p)->next;
 //    }
-
+    
     printf("List A: ");
     struct ListNode *q = headA;
     while (q != NULL) {
@@ -103,5 +113,12 @@ int main(int argc, const char * argv[]) {
     }
     printf("N\n");
 
+    printf("List part: ");
+    q = partition(headA,2);
+    while (q != NULL) {
+        printf("%d->", q->val);
+        q = q->next;
+    }
+    printf("N\n");
     return 0;
 }
