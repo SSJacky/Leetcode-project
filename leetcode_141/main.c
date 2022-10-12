@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 //Definition for singly-linked list.
 struct ListNode {
     int val;
@@ -28,28 +29,22 @@ void print_all_ptr(ListNode *list){
 
 
 
-struct ListNode* partition(struct ListNode* head,int x){
+bool hasCycle(struct ListNode *head) {
     
-    if(head == NULL) return NULL;
-    ListNode *connect_point = NULL;
-    ListNode *ret=NULL;
-    ListNode **bigger = &connect_point;
-    ListNode **smaller = &ret;
+    bool ret = 0;
+    ListNode *slow = head;
+    ListNode *fast = head+1;
     
-    while(head){
-        if(head->val<x){
-            *smaller = head;
-            smaller = &(*smaller)->next;
+    for(;fast->next && fast->next->next;fast=fast->next->next)
+    {
+        if(slow == fast || slow == fast->next)
+        {
+            ret = 1;
+            break;
         }
-        else{
-            *bigger = head;
-            bigger = &(*bigger)->next;
-        }
-        head=head->next;
+        slow = slow->next;
     }
     
-    (*smaller) = connect_point;
-    (*bigger) = NULL;
     return ret;
 }
 
@@ -57,17 +52,9 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     struct ListNode *headA
     = (struct ListNode *)calloc(6, sizeof(struct ListNode));
-    
+    bool ret = 0;
     
     struct ListNode **p = &headA;
-    (*p)->val = 1;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
-    
-    (*p)->val = 4;
-    (*p)->next = *p+1;
-    p=&((*p)->next);
-    
     (*p)->val = 3;
     (*p)->next = *p+1;
     p=&((*p)->next);
@@ -76,12 +63,20 @@ int main(int argc, const char * argv[]) {
     (*p)->next = *p+1;
     p=&((*p)->next);
     
-    (*p)->val = 5;
+    (*p)->val = 0;
     (*p)->next = *p+1;
     p=&((*p)->next);
     
-    (*p)->val = 2;
-    (*p)->next = NULL;
+    (*p)->val = -4;
+    (*p)->next = *p-2;
+    //p=&((*p)->next);
+    
+//    (*p)->val = 5;
+//    (*p)->next = *p+1;
+//    p=&((*p)->next);
+//
+//    (*p)->val = 2;
+//    (*p)->next = headA;
  
 //    int i;
 //    for (i = 1; i <= 5; i++) {
@@ -90,20 +85,19 @@ int main(int argc, const char * argv[]) {
 //        p = &(*p)->next;
 //    }
     
-    printf("List A: ");
+    printf("List A: \n");
     struct ListNode *q = headA;
-    while (q != NULL) {
-        printf("%d->", q->val);
+    for (int i =0;i<4;i++) {
+        printf("node %d address=%p\n",i,q);
+        printf("val %d = %d\n", i,q->val);
+        printf("next node %d= %p\n",i+1, q->next);
         q = q->next;
     }
-    printf("N\n");
+    
     
     printf("List part: ");
-    q = partition(headA,3);
-    while (q != NULL) {
-        printf("%d->", q->val);
-        q = q->next;
-    }
-    printf("N\n");
+    ret = hasCycle(headA);
+
+    printf("ret = %d\n",ret);
     return 0;
 }
