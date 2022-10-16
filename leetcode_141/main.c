@@ -27,18 +27,17 @@ void print_all_ptr(ListNode *list){
     printf("N\n");
 }
 
-
-
 bool hasCycle(struct ListNode *head) {
     
+    if(head == NULL)return;
     bool ret = 0;
     ListNode *slow = head;
-    ListNode *fast = head+1;
+                                                                                                                                                                                                            
     
-    for(;fast->next && fast->next->next;fast=fast->next->next)
-    {
+    for(ListNode *fast = (head->next);fast && fast->next;fast=fast->next->next)
+    {   
         if(slow == fast || slow == fast->next)
-        {
+        {   
             ret = 1;
             break;
         }
@@ -47,7 +46,6 @@ bool hasCycle(struct ListNode *head) {
     
     return ret;
 }
-
 int main(int argc, const char * argv[]) {
     // insert code here...
     struct ListNode *headA
