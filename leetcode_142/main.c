@@ -27,26 +27,37 @@ void print_all_ptr(ListNode *list){
     printf("N\n");
 }
 
-
-
-bool hasCycle(struct ListNode *head) {
+struct ListNode *detectCycle(struct ListNode *head) {
     
-    bool ret = 0;
-    ListNode *slow = head;
-    ListNode *fast = head+1;
+    if(head==NULL)return NULL;
+    ListNode *slow = head;                                                                   
+    ListNode *fast = head;
+    uint8_t no_circle_flag = 1;
     
-    for(;fast->next && fast->next->next;fast=fast->next->next)
+    for(;fast && fast->next;)
     {
-        if(slow == fast || slow == fast->next)
+        slow = slow->next;
+        fast=fast->next->next;
+        if(slow == fast)
         {
-            ret = 1;
+	    no_circle_flag=0;
             break;
         }
-        slow = slow->next;
+    }
+    if(no_circle_flag == 1) return NULL;
+
+    fast = head;
+
+    while(fast != slow)
+    {
+      slow = slow->next;
+      fast = fast->next;
     }
     
-    return ret;
+    return slow;
 }
+
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
