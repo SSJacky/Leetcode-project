@@ -26,24 +26,22 @@ void print_all_ptr(ListNode *list){
     }
     printf("N\n");
 }
-
 bool hasCycle(struct ListNode *head) {
     
     if(head == NULL)return;
     bool ret = 0;
     ListNode *slow = head;
-                                                                                                                                                                                                            
-    
-    for(ListNode *fast = (head->next);fast && fast->next;fast=fast->next->next)
+    ListNode *fast = head;                                                                          
+    for(;fast && fast->next;)
     {   
-        if(slow == fast || slow == fast->next)
+        slow = slow->next;
+        fast=fast->next->next;
+        if(slow == fast)
         {   
             ret = 1;
             break;
         }
-        slow = slow->next;
     }
-    
     return ret;
 }
 int main(int argc, const char * argv[]) {
