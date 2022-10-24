@@ -16,109 +16,43 @@ typedef struct {
     struct LRUCache *next;
 } LRUCache;
 
+struct node {
+   LRUCache *node;
+}**hash_table;
+
 LRUCache* lRUCacheCreate(int capacity) {
     LRUCache *head = malloc(sizeof(LRUCache)*capacity);
     return head;
 }
 
 int lRUCacheGet(LRUCache* obj, int key) {
-  
+    if(hash_table[key]->node!=obj) return 0;
+    else return 1;
 }
 
 void lRUCachePut(LRUCache* obj, int key, int value) {
-  
+    LRUCache **head = &obj;
+    LRUCache *current = obj;
+    if(*head == NULL) {
+        (*head)->val = value;
+        hash_table[key] = &(**head);
+    }
+    head = &(*head)->next;
+    hash_table[key]->node = current;
+    free(obj);
 }
 
 void lRUCacheFree(LRUCache* obj) {
     
 }
 
-void print() {
-    struct node_t *p = m_lru.head;
-    while (p) {
-        printf("(%d, %d) ", p->key, p->value);
-        p = p->next;
-    }
-    printf("\n");
+void print_all() {
+
 }
 
 int main() {
     printf("first test\n");
-    lruCacheInit(2);
-
-    lruCacheSet(2, 1);
-    print();
-    lruCacheSet(1, 1);
-    print();
-
-    lruCacheGet(2);
-    print();
-
-    lruCacheSet(4, 1);
-    print();
-
-    lruCacheGet(1);
-    print();
-    lruCacheGet(2);
-    print();
-
-    printf("second test\n");
-    lruCacheInit(2);
-
-    lruCacheSet(2, 1);
-    print();
-    lruCacheSet(1, 1);
-    print();
-
-    lruCacheSet(2, 3);
-    print();
-
-    lruCacheSet(4, 1);
-    print();
-
-    lruCacheGet(1);
-    print();
-    lruCacheGet(2);
-    print();
-
-    lruCacheFree();
-
-    printf("third test\n");
-    lruCacheInit(3);
-
-    lruCacheSet(1, 1);
-    print();
-    lruCacheSet(2, 2);
-    print();
-    lruCacheSet(3, 3);
-    print();
-    lruCacheSet(4, 4);
-    print();
-
-    lruCacheGet(4);
-    print();
-    lruCacheGet(3);
-    print();
-    lruCacheGet(2);
-    print();
-    lruCacheGet(1);
-    print();
-
-    lruCacheSet(5, 5);
-    print();
-
-    lruCacheGet(1);
-    print();
-    lruCacheGet(2);
-    print();
-    lruCacheGet(3);
-    print();
-    lruCacheGet(4);
-    print();
-    lruCacheGet(5);
-    print();
-
-    lruCacheFree();
+ 
 
     printf("all tests passed!\n");
 
