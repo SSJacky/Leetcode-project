@@ -28,6 +28,7 @@ LRUCache* lRUCacheCreate(int capacity) {
     uint32_t index = 1;
     
     LRUCache *head = (LRUCache *)malloc(sizeof(LRUCache)*(capacity));
+    m_lru.hash_table = (LRUCache **)malloc(sizeof(LRUCache *)*(capacity));
     LRUCache **current = &head;
     m_lru.head = head;
     m_lru.capacity = capacity;
@@ -58,19 +59,23 @@ int lRUCacheGet(LRUCache* obj, int key) {
         return 1;
     }
     else{
-        //LRUCache **indir = &obj;
-        LRUCache **head=obj;
+        /*remove get node*/
+        LRUCache **indir = &obj;
         LRUCache *current = (m_lru.hash_table[key]->prev);
-        if(current!=head){
-            current->next = m_lru.hash_table[key]->next;
-            current = current->next;
-            current->prev = m_lru.hash_table[key]->prev;
-            current = m_lru.tail->prev;
+        while(*indir != m_lru.hash_table[key]){
+            indir=&((*indir)->next);
         }
-        m_lru.hash_table[key]->next = m_lru.tail;
-        m_lru.hash_table[key]->prev = current;
-        m_lru.tail->prev = m_lru.hash_table[key];
-        current->next = m_lru.hash_table[key];
+        current = *indir;
+        *indir = m_lru.hash_table[key]->next;
+        
+        (*indir)->prev = current->prev;
+        /*insert node to tail*/
+        m_lru.head = obj;
+        m_lru.tail->next = m_lru.hash_table[key];
+        m_lru.hash_table[key]->prev = m_lru.tail;
+        m_lru.tail =m_lru.hash_table[key];
+        
+        
         return 1;
     }
 }
@@ -79,7 +84,8 @@ void lRUCachePut(LRUCache* obj, int key, int value) {
     LRUCache **indir = &obj;
     LRUCache *current = obj;
 
-    if(m_lru.tail->prev->valid==1){
+    if(m_lru.tail->valid==1){
+        
         indir=&((*indir)->next);
         
         current = (*indir)->next;
@@ -97,7 +103,6 @@ void lRUCachePut(LRUCache* obj, int key, int value) {
         return;
         
     }
-        
     while((*indir)->valid == 1){
         indir = &(*indir)->next;
     }
@@ -135,15 +140,43 @@ void print_all(LRUCache* list) {
     printf("N\n");
 }
 
+void print_hash(LRUCache** list,int capacity) {
+    printf("hash : \n");
+    for(int i = 0;i<capacity;i++){
+        if(list[i]==NULL){
+            printf(" N \n");
+        }
+        else {
+            LRUCache *q = list[i];
+            printf("head = %p\n", q);
+            printf("next = %p\n",q->next);
+            printf("prev = %p\n",q->prev);
+            printf("val = %d\n",q->val);
+            printf("valid = %d\n",q->valid);
+        }
+    }
+    
+}
+
 int main() {
     printf("first test\n");
  
     LRUCache* head_cache=lRUCacheCreate(3);
+    print_all(head_cache);
     
+    
+    lRUCachePut(head_cache,3,3);
+    print_all(head_cache);
+    lRUCachePut(head_cache,2,2);
+    print_all(head_cache);
+    lRUCachePut(head_cache,1,1);
     print_all(head_cache);
 
-    printf("all tests passed!\n");
-
+    lRUCacheGet(head_cache,3);
+    printf("all tests passed!\n\n");
+    print_all(head_cache);
+    //print_all(m_lru.hash_table[3]);
+ 
     return 0;
 }
 
