@@ -9,14 +9,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 //Definition for singly-linked list.
+#define HASH_SIZE 10001
 typedef struct node_t{
     int val;
     int valid;
     int key;
     struct node_t *next;
     struct node_t *prev;
-    struct node_t *hash_next;
-    struct node_t *hash_prev;
     
 } LRUCache;
 
@@ -29,24 +28,17 @@ struct lru_t {
     LRUCache **hash_table;
 } m_lru;
 
-int hash_index(int key)
-{
-    int index = key % m_lru.capacity;
-    return index;
-}
-
 LRUCache* lRUCacheCreate(int capacity) {
     uint32_t index = 1;
     uint32_t size = capacity+2;
     LRUCache *head = (LRUCache *)malloc(sizeof(LRUCache)*(capacity+2));
-    m_lru.hash_table = (LRUCache **)calloc(capacity,sizeof(LRUCache *));
+    m_lru.hash_table = (LRUCache **)calloc(HASH_SIZE,sizeof(LRUCache *));
     LRUCache **current = &head;
     m_lru.head = head;
     m_lru.capacity = capacity;
     
     (*current)->prev = NULL;
-    (*current)->hash_next = NULL;
-    (*current)->hash_prev = NULL;
+    
     
     while(index < size){
         (*current)->val = 0;
@@ -55,18 +47,14 @@ LRUCache* lRUCacheCreate(int capacity) {
         (*current)->next = *current+1;
         (*current+1)->prev = *current;
         current = &((*current)->next);
-        (*current)->hash_next = NULL;
-        (*current)->hash_prev = NULL;
         index++;
     }
-    
-    (*current)->hash_next = NULL;
-    (*current)->hash_prev = NULL;
+    m_lru.tail = m_lru.head->next;
     (*current)->val = 0;
     (*current)->key = 0;
     (*current)->valid = 0;
     (*current)->next = NULL;
-    m_lru.tail = *current;
+    
     m_lru.end = *current;
     m_lru.size = 0;
     
@@ -75,21 +63,9 @@ LRUCache* lRUCacheCreate(int capacity) {
 
 int lRUCacheGet(LRUCache* obj, int key) {
     
-    int index = hash_index(key);
-    int key_match_flg = 0;
-    LRUCache* q = m_lru.hash_table[index];
+    LRUCache* q = m_lru.hash_table[key];
     
-    while(q){
-        if(q->key!=key){
-            q = q->hash_next;
-        }
-        else{
-            key_match_flg = 1;
-            break;
-        }
-    }
-    
-    if(m_lru.hash_table[index]==NULL || key_match_flg == 0) {
+    if(q==NULL) {
         return -1;
     }
     else if(q->next == m_lru.tail){
@@ -99,9 +75,10 @@ int lRUCacheGet(LRUCache* obj, int key) {
         /*remove get node*/
         LRUCache **indir = &obj;
         LRUCache *current = (q->prev);
-        while(*indir != q){
-            indir=&((*indir)->next);
-        }
+        
+        indir=&(m_lru.hash_table[key]->prev->next);
+        
+        indir=&((*indir)->next);
         LRUCache *next = q->next;
         current->next = next;
         current->next->prev = current;
@@ -121,21 +98,11 @@ int lRUCacheGet(LRUCache* obj, int key) {
 void lRUCachePut(LRUCache* obj, int key, int value) {
     LRUCache **indir = &obj;
     LRUCache *current = obj;
-    LRUCache **tmp;
-    int index = hash_index(key);
     
     indir = &(*indir)->next;
     
     if(lRUCacheGet(obj,key)>=0){
-        
-        LRUCache* q = m_lru.hash_table[index];
-        
-        while(q){
-            if(q->key!=key){
-                q = q->hash_next;
-            }
-            else break;
-        }
+        LRUCache* q = m_lru.hash_table[key];
         if(q->val!=value) q->val = value;
         return;
     }
@@ -151,41 +118,25 @@ void lRUCachePut(LRUCache* obj, int key, int value) {
         current->prev->next = current;
         m_lru.tail->prev = current;
         current->next = m_lru.tail;
-
-        if(current->valid == 0)goto UPDATE;
+        m_lru.hash_table[current->key] = NULL;
         
-        tmp = &m_lru.hash_table[hash_index(current->key)];
-        while((*tmp)->key!=current->key){
-                tmp = &((*tmp)->hash_next);
-        }
-        *tmp = (*tmp)->hash_next;
-        
-    UPDATE:
         current->val = value;
         current->key = key;
         current->valid = 1;
-        tmp = &m_lru.hash_table[index];
-        while(*tmp){
-            tmp = &((*tmp)->hash_next);
-        }
-        *tmp = current;
+        m_lru.hash_table[key] = current;
         
         return;
         
     }
 
-    while((*indir)->valid == 1){
-        indir = &(*indir)->next;
-    }
+    
+    indir = &(m_lru.tail->prev->next);
+    
     (*indir)->val=value;
     (*indir)->valid=1;
     (*indir)->key=key;
     m_lru.tail = (*indir)->next;
-    tmp = &m_lru.hash_table[index];
-    while(*tmp){
-        tmp = &((*tmp)->hash_next);
-    }
-    *tmp = (*indir);
+    m_lru.hash_table[key] = (*indir);
     
 }
 
@@ -241,45 +192,41 @@ int main() {
     printf("first test\n");
     int ret = 0;
     
-    LRUCache* head_cache=lRUCacheCreate(3);
+    LRUCache* head_cache=lRUCacheCreate(1);
     
-    lRUCachePut(head_cache,1,1);
-    print_all(head_cache);
-    lRUCachePut(head_cache,2,2);
-    print_all(head_cache);
-    lRUCachePut(head_cache,3,3);
-    print_all(head_cache);
-    lRUCachePut(head_cache,4,4);
-    print_all(head_cache);
-    ret = lRUCacheGet(head_cache,4);
-    printf("\nret = %d\n\n",ret);
-    print_all(head_cache);
-    ret = lRUCacheGet(head_cache,3);
-    printf("\nret = %d\n\n",ret);
-    print_all(head_cache);
-    ret = lRUCacheGet(head_cache,2);
-    printf("\nret = %d\n\n",ret);
-    print_all(head_cache);
-    ret = lRUCacheGet(head_cache,1);
-    printf("\nret = %d\n\n",ret);
-    print_all(head_cache);
-    lRUCachePut(head_cache,5,5);
-    print_all(head_cache);
 
-    ret = lRUCacheGet(head_cache,1);
+    ret = lRUCacheGet(head_cache,6);
     printf("\nret = %d\n\n",ret);
     print_all(head_cache);
+    
+    ret = lRUCacheGet(head_cache,8);
+    printf("\nret = %d\n\n",ret);
+    print_all(head_cache);
+    
+    lRUCachePut(head_cache,12,1);
+    print_all(head_cache);
+    
     ret = lRUCacheGet(head_cache,2);
     printf("\nret = %d\n\n",ret);
     print_all(head_cache);
-    ret = lRUCacheGet(head_cache,3);
-    printf("\nret = %d\n\n",ret);
+    
+    lRUCachePut(head_cache,15,11);
     print_all(head_cache);
-    ret = lRUCacheGet(head_cache,4);
-    printf("\nret = %d\n\n",ret);
+    
+    lRUCachePut(head_cache,5,2);
     print_all(head_cache);
+    
+    lRUCachePut(head_cache,1,15);
+    print_all(head_cache);
+    
+    lRUCachePut(head_cache,4,2);
+    print_all(head_cache);
+    
     ret = lRUCacheGet(head_cache,5);
     printf("\nret = %d\n\n",ret);
+    print_all(head_cache);
+    
+    lRUCachePut(head_cache,15,15);
     print_all(head_cache);
 //
 //    lRUCachePut(head_cache,3,3);
